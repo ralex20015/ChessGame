@@ -1,5 +1,8 @@
 package models;
 
+import Pieces.Pawn;
+import Pieces.Piece;
+
 import java.awt.*;
 
 public class Logica {
@@ -7,10 +10,7 @@ public class Logica {
     private final int COLUMNS = 8;
     private final int ROWS = 8;
 
-    private String [] whitePawns;
-    private String []blackPawns;
-
-    private String [][] piece;
+    private Piece[][] pieces;
     private Point currentPiece;
     private Point pointClicked;
     private boolean somethingClicked;
@@ -18,37 +18,26 @@ public class Logica {
 
 
     public Logica(){
-        whitePawns = new String[COLUMNS];
-        blackPawns = new String[COLUMNS];
-        piece = new String[ROWS][COLUMNS];
+        pieces = new Piece[ROWS][COLUMNS];
         initializePieces();
     }
 
     private void initializePieces() {
-        for (int i = 0; i < ROWS; i++) {
-            piece[1][i] = "PawnW";
-            piece[6][i]= "PawnB";
+        for (int i = 7; i >= 0; i--) {
+            for (int j = 0; j < 8; j++) {
+                Point p = new Point(i+1,j+1);
+                if (i == 6){
+                  pieces[i][j] = new Pawn(p,PieceColor.BLACK);
+                }
+                if (i == 1){
+                    pieces[i][j] = new Pawn(p,PieceColor.WHITE);
+                }
+            }
         }
     }
 
-    public void clickSomething(Point p){
-        pointClicked = p;
-        if(isThereAPiece()  && !isSomethingClicked()){
-            currentPiece = p;
-            pieceClicked = piece[currentPiece.x][currentPiece.y];
-        }
-    }
-
-    private boolean isThereAPiece(){
-        return piece[pointClicked.x][pointClicked.y] != null;
-    }
-
-    public Point getCurrentPiece() {
-        return currentPiece;
-    }
-
-    public String getPieceClicked() {
-        return pieceClicked;
+    public Piece getSelected(Point p){
+        return pieces[p.x-1][p.y-1];
     }
 
     public boolean isSomethingClicked() {
@@ -57,5 +46,27 @@ public class Logica {
 
     public void setSomethingClicked(boolean somethingClicked) {
         this.somethingClicked = somethingClicked;
+    }
+
+    public boolean isValidMove(Piece piece, Point nextPosition){
+        if (piece instanceof Pawn){
+            Point currentPosition = piece.getPosition();
+            System.out.println(nextPosition);
+            return nextPosition.x == currentPosition.x + 1;
+        }
+        return false;
+    }
+
+    public void updatePieces(Point prevPoint,Point nextPoint){
+        int beforeMoveX = prevPoint.x-1;
+        int beforeMoveY = prevPoint.y-1;
+        int afterMoveX = nextPoint.x-1;
+        int afterMoveY = nextPoint.y-1;
+        pieces[afterMoveX][afterMoveY] = pieces[beforeMoveX][beforeMoveY];
+        pieces[beforeMoveX][beforeMoveY] = null;
+    }
+
+    public Piece[][] getPieces() {
+        return pieces;
     }
 }
