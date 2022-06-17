@@ -14,10 +14,11 @@ public class Logica {
     private Point currentPiece;
     private Point pointClicked;
     private boolean somethingClicked;
-    private String pieceClicked;
+    private Turn turn;
 
 
     public Logica(){
+        turn = Turn.WHITES;
         pieces = new Piece[ROWS][COLUMNS];
         initializePieces();
     }
@@ -48,11 +49,26 @@ public class Logica {
         this.somethingClicked = somethingClicked;
     }
 
-    public boolean isValidMove(Piece piece, Point nextPosition){
-        if (piece instanceof Pawn){
-            Point currentPosition = piece.getPosition();
-            System.out.println(nextPosition);
-            return nextPosition.x == currentPosition.x + 1;
+    public boolean isValidMove(ValidateMovements validateMovements){
+        PieceColor pieceColor = PieceColor.NULL;
+        //Vemos si hay una pieza en la otra posicion
+        Piece currentPieceSelected = validateMovements.getCurrentSelected();
+        Point nextPosition = validateMovements.getNextPosition();
+        Piece otherPiece = validateMovements.getPieceOnNextPosition();
+
+        if (currentPieceSelected != null){
+           pieceColor= currentPieceSelected.getPieceColor();
+        }
+
+        Turn temp;
+        if (pieceColor == PieceColor.BLACK){
+            temp = Turn.BLACKS;
+        }else{
+            temp = Turn.WHITES;
+        }
+
+        if (currentPieceSelected instanceof Pawn && getTurn() == temp){
+            return ((Pawn) currentPieceSelected).isValidMove(nextPosition,otherPiece);
         }
         return false;
     }
@@ -62,11 +78,28 @@ public class Logica {
         int beforeMoveY = prevPoint.y-1;
         int afterMoveX = nextPoint.x-1;
         int afterMoveY = nextPoint.y-1;
+
         pieces[afterMoveX][afterMoveY] = pieces[beforeMoveX][beforeMoveY];
+        pieces[afterMoveX][afterMoveY].setPosition(nextPoint);
+
+        if (turn == Turn.WHITES){
+            setTurn(Turn.BLACKS);
+        }else{
+            setTurn(Turn.WHITES);
+        }
+
         pieces[beforeMoveX][beforeMoveY] = null;
     }
 
     public Piece[][] getPieces() {
         return pieces;
+    }
+
+    public void setTurn(Turn turn){
+        this.turn = turn;
+    }
+
+    public Turn getTurn() {
+        return turn;
     }
 }

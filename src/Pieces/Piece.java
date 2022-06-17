@@ -9,8 +9,6 @@ abstract public class Piece {
     private Point position;
     private PieceColor pieceColor;
 
-    public abstract Point getDestinationPosition();
-
     public Piece(Point position, PieceColor pieceColor){
         this.position = position;
         this.pieceColor = pieceColor;
@@ -19,10 +17,6 @@ abstract public class Piece {
     public Piece(){
         this.position = null;
     }
-    private void move(){
-
-    }
-
     public Point getPosition() {
         return position;
     }

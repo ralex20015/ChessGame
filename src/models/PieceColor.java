@@ -1,5 +1,5 @@
 package models;
 
 public enum PieceColor {
-    BLACK,WHITE
+    BLACK,WHITE,NULL
 }
