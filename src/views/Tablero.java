@@ -1,118 +1,123 @@
 package views;
 
-import Pieces.Piece;
-import controller.BoardController;
-import models.Logica;
+import models.GameLogic;
+import models.Pieces.Piece;
+import util.ArrayHelper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.List;
 
-public class Tablero extends JFrame {
+public class Tablero extends JPanel {
 
-    private final Square [][] casillas;
-    private final String route = "src/Images/";
-    private final int ROWS = 8;
-    private final int COLUMNS = 8;
-    private final JPanel tablero;
-    private BoardController boardController;
+    private Square[][] squares;
+    private Player playerColor;
+    private List<Piece> pieces;
+    private Piece pieceSelected;
+    private Point previousPoint;
 
-    public Tablero() throws HeadlessException {
-        tablero = new JPanel();
-        tablero.setLayout(new GridLayout(ROWS,COLUMNS));
-        tablero.setLocation(65,50);
-        tablero.setSize(475,475);
-        initFrame();
-        casillas = new Square[ROWS][COLUMNS];
-        initilizeCasillas();
+
+    public Tablero(List<Piece> pieces) {
+        this.pieces = pieces;
+        resetGame();
     }
 
-    private void initFrame() {
-        setSize(600,600);
-        setLayout(null);
-        setLocationRelativeTo(null);
-        setResizable(false);
-        setTitle("Chess Game");
-        add(tablero,BorderLayout.CENTER);
-    }
-
-    private void initilizeCasillas(){
+    //Al tablero solo le interesa que pieza pintar
+    private void initBoard() {
         Point p;
-        for (int i = 7; i >= 0; i--) {
-            for (int j = 0; j <= 7; j++) {
-                p = new Point(i+1,j+1);
-                casillas[i][j] = new Square(p, initializePiecesImages(p));
-                tablero.add(casillas[i][j]);
-                if (i == 1 && j == 1){
-                    casillas[i][j].setIsAPiece(true);
+        if (playerColor == Player.WHITES) {
+            for (int i = 7; i >= 0; i--) {
+                for (int j = 0; j <= 7; j++) {
+                    p = new Point(i + 1, j + 1);
+                    squares[i][j] = new Square(p);
+                    add(squares[i][j]);
+                }
+            }
+        } else {
+            for (int i = 0; i <= 7; i++) {
+                for (int j = 7; j >= 0; j--) {
+                    p = new Point(i + 1, j + 1);
+                    squares[i][j] = new Square(p);
+                    add(squares[i][j]);
                 }
             }
         }
     }
-
-    private ImageIcon initializePiecesImages(Point initPosition){
-        return new ImageIcon(pieceToPaint(initPosition));
+    private void addPieces() {
+        for (Piece piece : pieces) {
+            if (piece != null) {
+                Point p = piece.getPosition();
+                squares[p.x - 1][p.y - 1].setImageIcon(
+                        paintIcon(GameLogic.getImageToPaintInBaseOfPiece(piece))
+                );
+            }
+        }
     }
 
-    private String pieceToPaint(Point p){
-        //white pieces
-        if (p.x == 2){
-            return route+"WHITE/pawn.png";
+    public void setGameController(GameController gameController) {
+        for (Square[] row : squares) {
+            for (Square square : row) {
+                square.setGameController(gameController);
+            }
         }
-
-        if (p.x == 1 && p.y == 4 ){
-            return route+"WHITE/queen.png";
-        }
-        if (p.x == 1 && p.y == 5){
-            return route+"WHITE/king.png";
-        }
-
-        if (p.x == 1 && p.y == 6 || p.x == 1 && p.y ==3){
-            return route+"WHITE/bishop.png";
-        }
-        if (p.x == 1 && p.y == 7 || p.x == 1 && p.y ==2){
-            return route+"WHITE/knight.png";
-        }
-        if (p.x == 1 && p.y == 8 || p.x == 1 && p.y ==1){
-            return route+"WHITE/tower.png";
-        }
-
-        //Black pieces
-        if (p.x == 7){
-            return route+"BLACK/pawn.png";
-        }
-        if (p.x == 8 && p.y == 1 || p.x == 8 && p.y == 8){
-            return route+"BLACK/tower.png";
-        }
-        if (p.x == 8 && p.y == 2 || p.x == 8 && p.y ==7){
-            return route+"BLACK/knight.png";
-        }
-        if (p.x == 8 && p.y == 3 || p.x == 8 && p.y ==6){
-            return route+"BLACK/bishop.png";
-        }
-        if (p.x == 8 && p.y == 4 ){
-            return route+"BLACK/king.png";
-        }
-        if (p.x == 8 && p.y == 5){
-            return route+"BLACK/queen.png";
-        }
-        return "";
+    }
+    private ImageIcon paintIcon(String route) {
+        return new ImageIcon(route);
     }
 
-    public void setIsAPiece(){
 
+    public void resetGame() {
+        removeAll();
+        int COLUMNS = 8;
+        int ROWS = 8;
+        setLayout(new GridLayout(ROWS, COLUMNS));
+        squares = new Square[ROWS][COLUMNS];
+        initBoard();
+        addPieces();
+        validate();
     }
 
-    public Square[][] getCasillas() {
-        return casillas;
-    }
-    public JPanel getTablero() {
-        return tablero;
+    public void resetPieces(List<Piece> pieces) {
+        this.pieces = pieces;
     }
 
-    /*public String typePiece(Piece piece){
+    public Tablero getTablero() {
+        return this;
+    }
 
-    }*/
+    public Square[][] getSquares() {
+        return squares;
+    }
 
+    public void setPlayerColor(Player playerColor) {
+        this.playerColor = playerColor;
+        resetGame();
+    }
+
+    public void setPieceSelected(Piece pieceSelected) {
+        Point p = ArrayHelper.normalCoordinatesToArrayCoordinates(pieceSelected);
+        if (p.equals(previousPoint)){
+            System.out.println("Enter the if: "+ p);
+            //AQUI Ya se que pieza se selecciono
+            squares[p.x][p.y].changeColor(false);
+            //Gestionar la accion
+//            squares[p.x][p.y].setImageIcon(
+//                    new ImageIcon(GameLogic.getImageToPaintInBaseOfPiece(this.pieceSelected))
+//            );
+//            squares[previousPoint.x][previousPoint.y].changeColor(false);
+//            squares[previousPoint.x][previousPoint.y].setImageIcon(null);
+
+        }else {
+            this.pieceSelected = pieceSelected;
+            System.out.println("Enter the else: "+p);
+            previousPoint = p;
+            squares[p.x][p.y].changeColor(true);
+        }
+    }
+
+    public void resetSquareToDefaultColor() {
+        squares[previousPoint.x][previousPoint.y].changeColor(false);
+        this.pieceSelected = null;
+        System.out.println("Reset pieces");
+    }
 }

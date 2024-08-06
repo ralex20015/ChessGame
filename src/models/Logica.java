@@ -1,7 +1,7 @@
 package models;
 
-import Pieces.Pawn;
-import Pieces.Piece;
+import models.Pieces.Pawn;
+import models.Pieces.Piece;
 
 import java.awt.*;
 
@@ -50,26 +50,26 @@ public class Logica {
     }
 
     public boolean isValidMove(ValidateMovements validateMovements){
-        PieceColor pieceColor = PieceColor.NULL;
+//        PieceColor pieceColor = PieceColor.NULL;
         //Vemos si hay una pieza en la otra posicion
         Piece currentPieceSelected = validateMovements.getCurrentSelected();
         Point nextPosition = validateMovements.getNextPosition();
         Piece otherPiece = validateMovements.getPieceOnNextPosition();
 
-        if (currentPieceSelected != null){
-           pieceColor= currentPieceSelected.getPieceColor();
-        }
-
-        Turn temp;
-        if (pieceColor == PieceColor.BLACK){
-            temp = Turn.BLACKS;
-        }else{
-            temp = Turn.WHITES;
-        }
-
-        if (currentPieceSelected instanceof Pawn && getTurn() == temp){
-            return ((Pawn) currentPieceSelected).isValidMove(nextPosition,otherPiece);
-        }
+//        if (currentPieceSelected != null){
+//           pieceColor= currentPieceSelected.getPieceColor();
+//        }
+//
+//        Turn temp;
+//        if (pieceColor == PieceColor.BLACK){
+//            temp = Turn.BLACKS;
+//        }else{
+//            temp = Turn.WHITES;
+//        }
+//
+//        if (currentPieceSelected instanceof Pawn && getTurn() == temp){
+//            return ((Pawn) currentPieceSelected).isValidMove(nextPosition,otherPiece);
+//        }
         return false;
     }
 

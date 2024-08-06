@@ -1,12 +1,10 @@
 package controller;
 
-import Pieces.Piece;
+import models.Pieces.Piece;
 import models.Logica;
-import models.PieceColor;
-import models.Turn;
 import models.ValidateMovements;
 import views.Square;
-import views.Tablero;
+import views.GameScreen;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +13,7 @@ import java.awt.event.MouseEvent;
 
 public class BoardController {
 
-    private final Square [][] squares;
+    //private final Square [][] squares;
     private Point currentClicked;
     private Point prevPoint;
     private boolean isSomethingSelected;
@@ -24,9 +22,9 @@ public class BoardController {
     private Piece currentPieceSelected;
     //restar a i-1 y j-1
 
-    public BoardController(Tablero game, Logica logica){
+    public BoardController(GameScreen game, Logica logica){
         this.logica = logica;
-        squares = game.getCasillas();
+       // squares = game.getCasillas();
         addListeners();
         isSomethingSelected = logica.isSomethingClicked();
     }
@@ -34,7 +32,7 @@ public class BoardController {
     private void addListeners() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                squares[i][j].addMouseListener(onClick(i,j));
+                //squares[i][j].addMouseListener(onClick(i,j));
             }
         }
     }
@@ -44,7 +42,7 @@ public class BoardController {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                currentClicked = squares[i][j].getP();
+               // currentClicked = squares[i][j].getP();
                 Piece piece = logica.getSelected(currentClicked);
                 //Si teniamos una pieza seleccionada y le damos en la misma pieza
                 if (prevPoint == currentClicked){
@@ -57,9 +55,9 @@ public class BoardController {
                 if (piece != null && !isSomethingSelected && isMyTurn(piece)){
                     logica.setSomethingClicked(true);
                     prevPoint = currentClicked;
-                    previousSquare = squares[i][j];
+                    //previousSquare = squares[i][j];
                     currentPieceSelected = piece;
-                    System.out.println(squares[i][j].isThereAPiece());
+                   // System.out.println(squares[i][j].isThereAPiece());
                     System.out.println("Se selecciono una pieza");
                 }
 
@@ -73,33 +71,33 @@ public class BoardController {
                     validateMovements.setNextPosition(currentClicked);
                     validateMovements.setPieceOnNextPosition(piece);
 
-                    if (logica.isValidMove(validateMovements)){
-                        move(currentClicked);
-                    }
+//                    if (logica.isValidMove(validateMovements)){
+//                        move(currentClicked);
+//                    }
                 }
 
                 isSomethingSelected = logica.isSomethingClicked();
-                if (squares[i][j].isThereAPiece()){
-                    squares[i][j].setSelected(isSomethingSelected);
-                }
+//                if (squares[i][j].isThereAPiece()){
+//                    squares[i][j].setSelected(isSomethingSelected);
+//                }
             }
         };
     }
 
-    private void move(Point nextPoint){
-        updateUI(nextPoint);
-        updateLogic();
-    }
+//    private void move(Point nextPoint){
+//        updateUI(nextPoint);
+//        updateLogic();
+//    }
 
-    private void updateUI(Point point) {
-        int i = point.x-1;
-        int j = point.y -1;
-        squares[i][j].setImage(getPieceImage(currentPieceSelected));
-        squares[i][j].setIsAPiece(true);
-        previousSquare.setImage(getPieceImage(null));
-        previousSquare.setIsAPiece(false);
-        previousSquare.setSelected(false);
-    }
+//    private void updateUI(Point point) {
+//        int i = point.x-1;
+//        int j = point.y -1;
+//        //squares[i][j].setImage(getPieceImage(currentPieceSelected));
+//        //squares[i][j].setIsAPiece(true);
+//        previousSquare.setImage(getPieceImage(null));
+//     //   previousSquare.setIsAPiece(false);
+//      //  previousSquare.setSelected(false);
+//    }
 
     private void updateLogic() {
         logica.setSomethingClicked(false);
@@ -116,17 +114,18 @@ public class BoardController {
         return new ImageIcon();
     }
     private boolean isMyTurn(Piece piece){
-        PieceColor pieceColor = PieceColor.NULL;
-        if (piece != null){
-            pieceColor= piece.getPieceColor();
-        }
+//        PieceColor pieceColor = PieceColor.NULL;
+//        if (piece != null){
+//            pieceColor= piece.getPieceColor();
+//        }
 
-        Turn temp;
-        if (pieceColor == PieceColor.BLACK){
-            temp = Turn.BLACKS;
-        }else{
-            temp = Turn.WHITES;
-        }
-        return temp == logica.getTurn();
+//        Turn temp;
+//        if (pieceColor == PieceColor.BLACK){
+//            temp = Turn.BLACKS;
+//        }else{
+//            temp = Turn.WHITES;
+//        }
+//        return temp == logica.getTurn();
+        return false;
     }
 }

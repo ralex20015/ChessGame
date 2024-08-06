@@ -1,10 +1,10 @@
-package Pieces;
+package models.Pieces;
 
 import models.PieceColor;
 
 import java.awt.*;
 
-public class Pawn extends Piece{
+public class Pawn extends Piece implements Actions{
 
     public Pawn(Point p,PieceColor pieceColor){
         super(p,pieceColor);
@@ -23,8 +23,7 @@ public class Pawn extends Piece{
     }
 
 
-
-    private boolean isStartPosition(){
+    private boolean isStartPosition() {
         Piece piece = this;
         Point currentPosition = piece.getPosition();
         return  currentPosition.x == 2 || currentPosition.x == 7;
@@ -65,5 +64,15 @@ public class Pawn extends Piece{
                     && otherPiece != null;
         }
        return false;
+    }
+
+    @Override
+    public void move(Point pointToMove, Piece piece) {
+        //Quiero saber que action realice
+        if (isValidMove(pointToMove, piece)){
+            setPosition(pointToMove);
+        }else {
+            System.out.println("No lo muevo");
+        }
     }
 }

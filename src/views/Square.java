@@ -1,87 +1,100 @@
 package views;
 
+import util.NumberToLetter;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-public class Square extends JPanel {
+public class Square extends JPanel implements MouseListener {
 
     private Point p;
-
-    private boolean isSelected;
-    private String defaultColor;
+    //Depende de este estado
     private ImageIcon imageIcon;
-    private boolean isThereApiece;
+    private Color squareColor;
+    private Color defaultColor;
+    private GameController gameController;
 
     public Square(Point p){
         this.p = p;
         setSquareColor(p);
         setOpaque(true);
-    }
-
-    public Square(Point p,ImageIcon imageIcon){
-        this.p = p;
-        this.imageIcon = imageIcon;
-        setSquareColor(p);
-        setOpaque(true);
+        addMouseListener(this);
     }
 
     private void setSquareColor(Point point){
         int result = point.x + point.y;
         if (result % 2 == 1){
-            defaultColor = "White";
+            squareColor = Color.WHITE;
         }else{
-            defaultColor = "Black";
+            squareColor = new Color(95,159,223);
         }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        setDefaultColor();
-        imageIcon.paintIcon(this,g,7,0);
-    }
-
-
-    public void setDefaultColor(){
-        if (!isSelected){
-            if (defaultColor.equals("White")){
-                setBackground(Color.WHITE);
-            }
-            if (defaultColor.equals("Black")){
-                setBackground(new Color(95,159,223));
-            }
-        }else{
-            setBackground(new Color(140,202,50));
+        //Las letras del square dependen del estado Player
+        setBackground(squareColor);
+        if (p.y == 1)
+            g.drawString(String.valueOf(p.x), 5, 10);
+        if (p.x == 1) {
+            g.drawString(NumberToLetter.convertNumberToLetter(p.y), 50, 50);
         }
-    }
-
-    public void setImage(ImageIcon piece){
-        this.imageIcon = piece;
-        repaint();
+        if (imageIcon != null) {
+            imageIcon.paintIcon(this,g,7,0);
+        }
     }
 
     public Point getP() {
         return p;
     }
 
-    public boolean isThereAPiece(){
-        return isThereApiece;
+    public void setPoint(Point p) {
+        this.p = p;
     }
 
-    public void setIsAPiece(boolean isAPiece){
-        this.isThereApiece = isAPiece;
+    public void setImageIcon(ImageIcon imageIcon){
+        this.imageIcon = imageIcon;
     }
 
-    public void setSelected(boolean selected) {
-        isSelected = selected;
-        if (isSelected){
-            repaint();
-        }else{
-            repaint();
+    public ImageIcon getImageIcon() {
+        return imageIcon;
+    }
+
+    public void setGameController(GameController gameController) {
+        this.gameController = gameController;
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent mouseEvent) {
+        gameController.onSquareClicked(this);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent mouseEvent) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent mouseEvent) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent mouseEvent) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent mouseEvent) {
+    }
+
+    public void changeColor(boolean isSomethingSelected) {
+        if (isSomethingSelected) {
+            squareColor = Color.GREEN;
+        }else {
+            setSquareColor(p);
         }
-    }
-
-    public String getDefaultColor() {
-        return defaultColor;
+        repaint();
     }
 }

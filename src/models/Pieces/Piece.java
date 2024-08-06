@@ -1,10 +1,10 @@
-package Pieces;
+package models.Pieces;
 
 import models.PieceColor;
 
 import java.awt.*;
 
-abstract public class Piece {
+abstract public class Piece implements Actions{
 
     private Point position;
     private PieceColor pieceColor;
