@@ -1,22 +1,21 @@
 package views;
 
 import models.GameLogic;
+import models.PieceState;
 import models.Pieces.Piece;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameViewModel implements GameController, Subject {
 
-    private boolean isPieceSelected;
-    private GameLogic gameLogic;
+    private final GameLogic gameLogic;
     private Piece piece;
     private List<Piece> pieces;
     private Point pointToMovePiece;
-    private Square previousSquare;
-    private List<Observer> observers;
+    private final List<Observer> observers;
+    private PieceState pieceState;
 
     public GameViewModel() {
         gameLogic = new GameLogic();
@@ -25,18 +24,14 @@ public class GameViewModel implements GameController, Subject {
     }
 
     public void resetGame() {
-        //Las piezas se van a pintar en base a el modelo
-        // repository.resetGame();
         gameLogic.resetGame();
         pieces = gameLogic.getPieces();
+        notifyObservers();
     }
 
     public void setPlayerColor(Player playerColor) {
         gameLogic.setPlayerColor(playerColor);
-    }
-
-    public void onPieceSelected() {
-
+        notifyObservers();
     }
 
     public List<Piece> getPieces() {
@@ -55,31 +50,21 @@ public class GameViewModel implements GameController, Subject {
         if (!isThereAPieceSelected()) {
             this.piece = piece;
             if (piece != null) {
-                //Aqui entraria mi observable
-//                previousSquare = square;
-//                square.changeColor(true);
+                pieceState = PieceState.PIECE_SELECTED;
                 notifyObservers();
             }
         } else {
             if (isPieceSelectedAgain()) {
                 this.piece = null;
+                pieceState = PieceState.DESELECT_PIECE;
             } else {
-                this.piece.move(pointToMovePiece, piece);
-                //Update ImageIcon on the squares
-
-                //Estoy introduciendo side effects en esto
-                //previousSquare.setImageIcon(null);
-//                square.setImageIcon(
-//                        new ImageIcon(GameLogic.getImageToPaintInBaseOfPiece(this.piece))
-//                );
-                //Notificar que cambio la posicion de una pieza
+                pieceState = this.piece.move(pointToMovePiece, piece);
             }
             notifyObservers();
-            //Update UI
-//            resetColorOfSquare(square);
-//
-//            //Update logic
-            resetStatesToDefault();
+
+            if (pieceState != PieceState.DO_NOTHING)
+                resetStatesToDefault();
+
         }
     }
 
@@ -93,12 +78,6 @@ public class GameViewModel implements GameController, Subject {
 
     private void resetStatesToDefault() {
         this.piece = null;
-        previousSquare = null;
-    }
-
-    private void resetColorOfSquare(Square square) {
-        square.changeColor(false);
-        previousSquare.changeColor(false);
     }
 
     @Override
@@ -120,5 +99,13 @@ public class GameViewModel implements GameController, Subject {
 
     public Piece getPiece() {
         return piece;
+    }
+
+    public PieceState getPieceState() {
+        return pieceState;
+    }
+
+    public Point getPointToMovePiece() {
+        return pointToMovePiece;
     }
 }

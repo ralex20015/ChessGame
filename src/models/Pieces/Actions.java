@@ -1,7 +1,9 @@
 package models.Pieces;
 
+import models.PieceState;
+
 import java.awt.*;
 
 public interface Actions {
-    void move(Point pointToMove, Piece piece);
+    PieceState move(Point pointToMove, Piece piece);
 }

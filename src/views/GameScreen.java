@@ -1,6 +1,8 @@
 package views;
 
 
+import models.PieceState;
+
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -9,18 +11,17 @@ import java.awt.*;
 public class GameScreen extends JFrame implements Observer {
 
 
-    private final Tablero tablero;
+    private final Board tablero;
     private final GameViewModel gameViewModel;
 
 
     public GameScreen() throws HeadlessException {
         gameViewModel = new GameViewModel();
         setCustomBar();
-        tablero = new Tablero(gameViewModel.getPieces());
+        tablero = new Board(gameViewModel.getPieces());
         tablero.setLocation(65, 50);
         tablero.setSize(475, 475);
-        tablero.setPlayerColor(gameViewModel.getPlayerColor());
-        tablero.setGameController(gameViewModel);
+        resetGame();
         gameViewModel.addObserver(this);
         initFrame();
     }
@@ -31,22 +32,32 @@ public class GameScreen extends JFrame implements Observer {
 
         JMenuItem itemBarPlayAsWhite = new JMenuItem("Blancas");
         itemBarPlayAsWhite.addActionListener(actionEvent -> {
+            gameViewModel.resetGame();
             gameViewModel.setPlayerColor(Player.WHITES);
-            tablero.setPlayerColor(gameViewModel.getPlayerColor());
+            resetGame();
         });
 
         JMenuItem itemBarPlayAsBlack = new JMenuItem("Negras");
         itemBarPlayAsBlack.addActionListener(actionEvent -> {
+            gameViewModel.resetGame();
             gameViewModel.setPlayerColor(Player.BLACKS);
-            tablero.setPlayerColor(gameViewModel.getPlayerColor());
+            resetGame();
         });
+        JMenu menuResetGame = getMenu();
+        barPlayAs.add(itemBarPlayAsBlack);
+        barPlayAs.add(itemBarPlayAsWhite);
+        menu.add(barPlayAs);
+        menu.add(menuResetGame);
+        setJMenuBar(menu);
+    }
+
+    private JMenu getMenu() {
         JMenu menuResetGame = new JMenu("Reiniciar juego");
         menuResetGame.addMenuListener(new MenuListener() {
             @Override
             public void menuSelected(MenuEvent menuEvent) {
                 gameViewModel.resetGame();
-                tablero.resetGame();
-                tablero.resetPieces(gameViewModel.getPieces());
+                resetGame();
             }
 
             @Override
@@ -59,11 +70,7 @@ public class GameScreen extends JFrame implements Observer {
 
             }
         });
-        barPlayAs.add(itemBarPlayAsBlack);
-        barPlayAs.add(itemBarPlayAsWhite);
-        menu.add(barPlayAs);
-        menu.add(menuResetGame);
-        setJMenuBar(menu);
+        return menuResetGame;
     }
 
     private void initFrame() {
@@ -79,10 +86,19 @@ public class GameScreen extends JFrame implements Observer {
     @Override
     public void update() {
         //Maybe hacer otro callback
-        if (gameViewModel.isThereAPieceSelected())
+        if (gameViewModel.getPieceState() == PieceState.PIECE_SELECTED)
             tablero.setPieceSelected(gameViewModel.getPiece());
-        else {
-            tablero.resetSquareToDefaultColor();
+        else if (gameViewModel.getPieceState() == PieceState.DESELECT_PIECE){
+            tablero.resetSquareSelectedToDefaultColor();
+        }else if(gameViewModel.getPieceState() == PieceState.MOVE){
+            tablero.movePiece(gameViewModel.getPointToMovePiece());
         }
+    }
+
+    private void resetGame() {
+        tablero.resetPieces(gameViewModel.getPieces());
+        tablero.setPlayerColor(gameViewModel.getPlayerColor());
+        tablero.resetGame();
+        tablero.setGameController(gameViewModel);
     }
 }

@@ -1,6 +1,7 @@
 package models.Pieces;
 
 import models.PieceColor;
+import models.PieceState;
 
 import java.awt.*;
 
@@ -67,12 +68,14 @@ public class Pawn extends Piece implements Actions{
     }
 
     @Override
-    public void move(Point pointToMove, Piece piece) {
+    public PieceState move(Point pointToMove, Piece piece) {
         //Quiero saber que action realice
         if (isValidMove(pointToMove, piece)){
             setPosition(pointToMove);
+            return PieceState.MOVE;
         }else {
             System.out.println("No lo muevo");
+            return PieceState.DO_NOTHING;
         }
     }
 }

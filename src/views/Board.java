@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class Tablero extends JPanel {
+public class Board extends JPanel {
 
     private Square[][] squares;
     private Player playerColor;
@@ -17,7 +17,7 @@ public class Tablero extends JPanel {
     private Point previousPoint;
 
 
-    public Tablero(List<Piece> pieces) {
+    public Board(List<Piece> pieces) {
         this.pieces = pieces;
         resetGame();
     }
@@ -81,43 +81,37 @@ public class Tablero extends JPanel {
         this.pieces = pieces;
     }
 
-    public Tablero getTablero() {
-        return this;
-    }
-
-    public Square[][] getSquares() {
-        return squares;
-    }
-
     public void setPlayerColor(Player playerColor) {
         this.playerColor = playerColor;
-        resetGame();
     }
 
     public void setPieceSelected(Piece pieceSelected) {
+        System.out.println("Select Square on: "+pieceSelected.getPosition());
         Point p = ArrayHelper.normalCoordinatesToArrayCoordinates(pieceSelected);
-        if (p.equals(previousPoint)){
-            System.out.println("Enter the if: "+ p);
-            //AQUI Ya se que pieza se selecciono
-            squares[p.x][p.y].changeColor(false);
-            //Gestionar la accion
-//            squares[p.x][p.y].setImageIcon(
-//                    new ImageIcon(GameLogic.getImageToPaintInBaseOfPiece(this.pieceSelected))
-//            );
-//            squares[previousPoint.x][previousPoint.y].changeColor(false);
-//            squares[previousPoint.x][previousPoint.y].setImageIcon(null);
-
-        }else {
-            this.pieceSelected = pieceSelected;
-            System.out.println("Enter the else: "+p);
-            previousPoint = p;
-            squares[p.x][p.y].changeColor(true);
-        }
+        this.pieceSelected = pieceSelected;
+        previousPoint = p;
+        squares[p.x][p.y].changeColor(true);
     }
 
-    public void resetSquareToDefaultColor() {
-        squares[previousPoint.x][previousPoint.y].changeColor(false);
+    public void resetSquareSelectedToDefaultColor() {
+        if (previousPoint != null)
+            squares[previousPoint.x][previousPoint.y].changeColor(false);
         this.pieceSelected = null;
+        previousPoint = null;
         System.out.println("Reset pieces");
+    }
+
+    public void movePiece(Point pointToMovePiece) {
+        Point temp = ArrayHelper.normalCoordinatesToArrayCoordinates(pointToMovePiece);
+        if (previousPoint != null) {
+            squares[previousPoint.x][previousPoint.y].setImageIcon(null);
+            squares[temp.x][temp.y].setImageIcon(
+                    new ImageIcon(GameLogic.getImageToPaintInBaseOfPiece(pieceSelected))
+            );
+        }
+
+        squares[temp.x][temp.y].repaint();
+        System.out.println("Movemos pieza a :"+pointToMovePiece);
+        resetSquareSelectedToDefaultColor();
     }
 }
